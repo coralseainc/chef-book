@@ -6,16 +6,15 @@ Vagrant.configure("2") do |config|
   # options are documented and commented below. For a complete reference,
   # please see the online documentation at vagrantup.com.
 
-  config.vm.hostname = "chef-repo-berkshelf"
+  config.vm.hostname = "my-cookbook-berkshelf"
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "opscode-centos-6.5"
+  config.vm.box = "Berkshelf-CentOS-6.3-x86_64-minimal"
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
+  #config.vm.box_url = "https://dl.dropbox.com/u/31081437/Berkshelf-CentOS-6.3-x86_64-minimal.box"
   config.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_centos-6.5_chef-provisionerless.box"
-
-  config.omnibus.chef_version = :latest
 
   # Assign this VM to a host-only network IP, allowing you to access it
   # via the IP. Host-only networks can talk to the host machine as well as
@@ -72,7 +71,7 @@ Vagrant.configure("2") do |config|
   # to skip installing and copying to Vagrant's shelf.
   # config.berkshelf.except = []
 
-  config.vm.provision :chef_client do |chef|
+  config.vm.provision :chef_solo do |chef|
     chef.json = {
       :mysql => {
         :server_root_password => 'rootpass',
@@ -81,14 +80,8 @@ Vagrant.configure("2") do |config|
       }
     }
 
-    chef.provisioning_path = "/etc/chef"
-    chef.chef_server_url = "https://api.opscode.com/organizations/coral-sea"
-    chef.validation_key_path = ".chef/coral-sea-validator.pem"
-    chef.validation_client_name = "coral-sea-validator"
-    chef.node_name = "server"
-
     chef.run_list = [
-        #"recipe[chef-repo::default]"
+        "recipe[my_cookbook::default]"
     ]
   end
 end
