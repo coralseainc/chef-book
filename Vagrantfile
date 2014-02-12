@@ -9,7 +9,7 @@ Vagrant.configure("2") do |config|
   config.vm.hostname = "my-cookbook-berkshelf"
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "Berkshelf-CentOS-6.3-x86_64-minimal"
+  config.vm.box = "opscode-CentOS-6.5-x86_64-minimal"
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
@@ -21,6 +21,8 @@ Vagrant.configure("2") do |config|
   # any other machines on the same network, but cannot be accessed (through this
   # network interface) by any external networks.
   config.vm.network :private_network, ip: "33.33.33.10"
+
+  config.omnibus.chef_version = :latest
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -71,14 +73,21 @@ Vagrant.configure("2") do |config|
   # to skip installing and copying to Vagrant's shelf.
   # config.berkshelf.except = []
 
-  config.vm.provision :chef_solo do |chef|
-    chef.json = {
-      :mysql => {
-        :server_root_password => 'rootpass',
-        :server_debian_password => 'debpass',
-        :server_repl_password => 'replpass'
-      }
-    }
+  #config.vm.provision :chef_solo do |chef|
+  #  chef.json = {
+  #   :mysql => {
+  #      :server_root_password => 'rootpass',
+  #      :server_debian_password => 'debpass',
+  #      :server_repl_password => 'replpass'
+  #    }
+  #  }
+
+  config.vm.provision :chef_client do |chef|
+    chef.provisioning_path = "/etc/chef"
+    chef.chef_server_url = "https://api.opscode.com/organizations/coral-sea"
+    chef.validation_key_path = "./.chef/coral-sea-validator.pem"
+    chef.validation_client_name = "coral-sea-validator"
+    chef.node_name = "server"
 
     chef.run_list = [
         "recipe[my_cookbook::default]"
